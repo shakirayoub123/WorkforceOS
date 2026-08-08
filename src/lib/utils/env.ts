@@ -19,6 +19,8 @@ function getEnv(key: string, fallback?: string): string {
 
 export const serverEnv = {
     DATABASE_URL: getEnv("DATABASE_URL"),
-    NEXTAUTH_SECRET: getEnv("NEXTAUTH_SECRET", "dev-secret-change-in-production"),
+    AUTH_SECRET: getEnv("AUTH_SECRET", process.env.NEXTAUTH_SECRET ?? "dev-secret-change-in-production"),
+    NEXTAUTH_SECRET: getEnv("NEXTAUTH_SECRET", process.env.AUTH_SECRET ?? "dev-secret-change-in-production"),
     NEXTAUTH_URL: getEnv("NEXTAUTH_URL", "http://localhost:3000"),
+    SEED_USER_PASSWORD: process.env.SEED_USER_PASSWORD ?? "ChangeMe123!",
 } as const;

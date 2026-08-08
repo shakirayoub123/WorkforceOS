@@ -1,0 +1,103 @@
+import { PrismaClient } from "@/generated/prisma/client";
+import bcrypt from "bcryptjs";
+import { ACCOUNT_STATUS, USER_ROLES } from "../src/config/constants";
+
+const prisma = new PrismaClient();
+
+async function main() {
+  const seedPassword = process.env.SEED_USER_PASSWORD;
+  if (!seedPassword) {
+    throw new Error("Missing SEED_USER_PASSWORD environment variable.");
+  }
+
+  const passwordHash = await bcrypt.hash(seedPassword, 12);
+  const company = await prisma.company.upsert({
+    where: { slug: "acme-construction" },
+    update: {},
+    create: {
+      name: "Acme Construction",
+      slug: "acme-construction",
+      email: "hello@acme.test",
+      phone: "+1-555-0100",
+      website: "https://acme.test",
+      logo: null,
+      address: "123 Market Street",
+      city: "Seattle",
+      state: "WA",
+      country: "US",
+      timezone: "America/Los_Angeles",
+      status: "ACTIVE",
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "superadmin@example.com" },
+    update: {},
+    create: {
+      name: "Super Admin",
+      email: "superadmin@example.com",
+      passwordHash,
+      role: USER_ROLES.SUPER_ADMIN,
+      phone: null,
+      avatar: null,
+      status: ACCOUNT_STATUS.ACTIVE,
+      emailVerified: true,
+      companyId: null,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "admin@acme.test" },
+    update: {},
+    create: {
+      name: "Acme Admin",
+      email: "admin@acme.test",
+      passwordHash,
+      role: USER_ROLES.COMPANY_ADMIN,
+      phone: null,
+      avatar: null,
+      status: ACCOUNT_STATUS.ACTIVE,
+      emailVerified: true,
+      companyId: company.id,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "manager@acme.test" },
+    update: {},
+    create: {
+      name: "Acme Manager",
+      email: "manager@acme.test",
+      passwordHash,
+      role: USER_ROLES.MANAGER,
+      phone: null,
+      avatar: null,
+      status: ACCOUNT_STATUS.ACTIVE,
+      emailVerified: true,
+      companyId: company.id,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "worker@acme.test" },
+    update: {},
+    create: {
+      name: "Acme Worker",
+      email: "worker@acme.test",
+      passwordHash,
+      role: USER_ROLES.WORKER,
+      phone: null,
+      avatar: null,
+      status: ACCOUNT_STATUS.ACTIVE,
+      emailVerified: true,
+      companyId: company.id,
+    },
+  });
+
+  console.log("Seeded company and demo users.");
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
