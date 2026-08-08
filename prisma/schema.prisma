@@ -1,0 +1,21 @@
+// =============================================================================
+// WorkforceOS — Database Schema
+// =============================================================================
+//
+// This schema will be expanded in future phases:
+//
+//   Phase 1: Users, Companies, Roles, Sessions (Auth + Multi-tenancy)
+//   Phase 2: Projects, Tasks, Attendance, Leave, Inventory, Payroll
+//   Phase 3: Messages, Notifications, Subscriptions, Analytics
+//
+// For now, only the datasource and generator are configured.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
